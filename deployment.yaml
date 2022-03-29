@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guestbook-gui
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: guestbook-gui
+  template:
+    metadata:
+      labels:
+        app: guestbook-gui
+    spec:
+      containers:
+        - image: gcr.io/heptio-images/ks-guestbook-demo:0.1
+          imagePullPolicy: IfNotPresent
+          name: guestbook-ui
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+      restartPolicy: Always
